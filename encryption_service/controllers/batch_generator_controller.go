@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"langxing.com/label-encryption/clients"
 	"log"
@@ -14,7 +13,6 @@ import (
 const (
 	VendorCode     = "LFE86"
 	BanCode        = "A1"
-	PartCode       = "U8101010-M21-C00/C"
 	SeparationCode = "*"
 	FillCode       = "001"
 )
@@ -39,6 +37,11 @@ func RunBatchGeneratorController() int {
 	}
 	if !strings.HasSuffix(fileName, ".txt") {
 		fileName = fileName + ".txt"
+	}
+	partCode := StringPrompt("请输入零件码 (例子 8101010-M01-C00/C)")
+	if len(partCode) == 0 {
+		log.Print("输入的零件码无效")
+		return 1
 	}
 	rawDate := StringPrompt("请输入日期 (例子 20231027): ")
 	if len(rawDate) != 8 {
@@ -80,7 +83,7 @@ func RunBatchGeneratorController() int {
 		dateCode := GetDateCode(dateInput)
 		idCode := fmt.Sprintf("%07d", curId)
 
-		codeToEncrypt := fmt.Sprintf("%s%s%s%s%s%s%s\n", VendorCode, dateCode, BanCode, idCode, PartCode,
+		codeToEncrypt := fmt.Sprintf("%s%s%s%s%s%s%s\n", VendorCode, dateCode, BanCode, idCode, partCode,
 			SeparationCode, FillCode)
 		encryptedCode, err := clients.EncryptText(codeToEncrypt)
 		if err != nil {
@@ -101,20 +104,23 @@ func RunBatchGeneratorController() int {
 			BanCode:        BanCode,
 			IdCode:         idCode,
 			VerifyCode:     verifyCode,
-			PartCode:       PartCode,
+			PartCode:       partCode,
 			SeparationCode: SeparationCode,
 			FillCode:       FillCode,
 			EncryptedCode:  encryptedCode,
 		}
+		log.Println(res)
 
-		resJson, err := json.Marshal(res)
-		if err != nil {
-			fmt.Println("JSON处理出错")
+		resList := []string{
+			VendorCode, dateCode, BanCode, idCode, verifyCode,
+			partCode, SeparationCode, FillCode, encryptedCode}
+
+		resString := strings.Join(resList, "\t")
+		stringToWrite := resString + "\n"
+		if i == totalNum - 1 {
+			stringToWrite = resString
 		}
-
-		textToAppend := string(resJson)
-
-		if _, err := f.WriteString(textToAppend + "\n"); err != nil {
+		if _, err := f.WriteString(stringToWrite); err != nil {
 			log.Println(err)
 			return 1
 		}
