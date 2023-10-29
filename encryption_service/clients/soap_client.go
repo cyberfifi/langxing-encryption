@@ -136,8 +136,8 @@ func GetHelloResult() (string, error) {
 		},
 	}
 	payload, err := xml.MarshalIndent(helloRq, "", "  ")
-	fmt.Println("SOAP请求----")
-	fmt.Println(string(payload))
+	//fmt.Println("SOAP请求----")
+	//fmt.Println(string(payload))
 	timeout := 30 * time.Second
 	client := http.Client{
 		Timeout: timeout,
@@ -161,8 +161,8 @@ func GetHelloResult() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("SOAP结果:")
-	fmt.Println(string(bodyBytes))
+	//fmt.Println("SOAP结果:")
+	//fmt.Println(string(bodyBytes))
 	defer response.Body.Close()
 	var result SoapHelloResponse
 	err = xml.Unmarshal(bodyBytes, &result)
@@ -180,7 +180,7 @@ func GetHelloResult() (string, error) {
 }
 
 func GetVerifyCode(text string) (string, error) {
-	log.Println("开始获取校验位...")
+	// log.Println("开始获取校验位...")
 	envelop := SoapGetVerifyCodeRequestEnvelop{
 		XMLNsSoap: "http://schemas.xmlsoap.org/soap/envelope/",
 		XMLNsWser: "http://wserver",
@@ -191,9 +191,9 @@ func GetVerifyCode(text string) (string, error) {
 		},
 	}
 	payload, err := xml.MarshalIndent(envelop, "", "  ")
-	fmt.Println("SOAP请求:")
-	fmt.Println(string(payload))
-	fmt.Println("---------")
+	//fmt.Println("SOAP请求:")
+	//fmt.Println(string(payload))
+	//fmt.Println("---------")
 
 	timeout := 30 * time.Second
 	client := http.Client{
@@ -217,8 +217,8 @@ func GetVerifyCode(text string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("SOAP结果:")
-	fmt.Println(string(bodyBytes))
+	// fmt.Println("SOAP结果:")
+	// fmt.Println(string(bodyBytes))
 	defer response.Body.Close()
 	var result SoapGetVerifyCodeResponse
 	err = xml.Unmarshal(bodyBytes, &result)
@@ -239,9 +239,9 @@ func EncryptText(text string) (string, error) {
 		},
 	}
 	payload, err := xml.MarshalIndent(envelop, "", "  ")
-	fmt.Println("SOAP请求:")
-	fmt.Println(string(payload))
-	fmt.Println("----------------------")
+	//fmt.Println("SOAP请求:")
+	//fmt.Println(string(payload))
+	//fmt.Println("----------------------")
 
 	timeout := 30 * time.Second
 	client := http.Client{
@@ -266,9 +266,9 @@ func EncryptText(text string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("SOAP结果:")
-	fmt.Println(string(bodyBytes))
-	fmt.Println("----------------------")
+	//fmt.Println("SOAP结果:")
+	//fmt.Println(string(bodyBytes))
+	//fmt.Println("----------------------")
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
